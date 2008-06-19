@@ -23,7 +23,7 @@ var HoverAccordion = Class.create({
   },
   
   setup: function(elem) {
-    this.elem       = $(this.elem);
+    this.elem = $(this.elem);
     this.isSliding = false;
 
     this.elem.select('dt + dd').each(function(e) {
@@ -54,16 +54,16 @@ var HoverAccordion = Class.create({
       return;
 
     this.isSliding = true;
+    this.currentElement.removeClassName(this.options.activeClass);
+    clickedElement.addClassName(this.options.activeClass);
     this.options.effect.bind(this)(clickedElement.next('dd'), 
-                        this.currentElement.next('dd'),
-                        this.afterSlide.curry(clickedElement).bind(this));
+                                   this.currentElement.next('dd'),
+                                   this.afterSlide.curry(clickedElement).bind(this));
   },
   
   afterSlide: function(clickedElement) {
-    this.isSliding = false;
-    this.currentElement.removeClassName(this.options.activeClass);
+    this.isSliding      = false;
     this.currentElement = clickedElement;
-    this.currentElement.addClassName(this.options.activeClass);
   },
   
   effect: {
@@ -75,7 +75,7 @@ var HoverAccordion = Class.create({
     
     slide: function(showElem, hideElem, afterCallback) {
       new Effect.Parallel([
-        Effect.SlideDown(showElem),
+        Effect.BlindDown(showElem),
         Effect.BlindUp(hideElem)
       ], { 
         duration: this.options.duration / 1000,
