@@ -8,31 +8,38 @@
 	<script src="effects.js" type="text/javascript" charset="utf-8"></script>
 	<script src="hover-accordion.js" type="text/javascript" charset="utf-8"></script>
 	<script type="text/javascript" charset="utf-8">
-	  document.observe('dom:loaded', function() {
-      new HoverAccordion('accordion');
-  	});
+    new HoverAccordion('accordion1');
+    new HoverAccordion('accordion2', {
+      activeClass: 'pandas'
+    });
 	</script>
-	<style type="text/css" media="screen">
-	</style>
 </head>
 <body>
-  <div id="accordion">
-    <div id="section1" class="section">
-      <h5><span>Sage Abra HRMS Recorded Demos</span></h5>
-    </div>
-    <div id="section2" class="section">
-      <h5><span>Sage Abra Core Modules</span></h5>
+  <dl id="accordion1">
+    <dt>Sage Abra HRMS Recorded Demos</dt>
+    <dt class="active">Sage Abra Core Modules</dt>
+    <dd>
       <ul>
         <li>Subitem 1a</li>
         <li>Subitem 1b</li>
       </ul>
-    </div>
-    <div id="section6" class="section active">
-      <h5><span>Featured Demo</span></h5>
-      <div class="content">
-        <a href="">Featured Demo</a>
-      </div>
-    </div>
-  </div><!-- #accordion -->
+    </dd>
+    <dt>Featured Demo</dt>
+    <dd>
+      <a href="">Featured Demo</a>
+    </dd>
+  </dl>
+  
+  <dl id="accordion2">
+    <dt class="pandas">Lorem ipsum dolor sit amet</dt>
+    <dd>
+      <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+    </dd>
+    <dt>Featured Demo</dt>
+    <dd>
+      <a href="">Featured Demo</a>
+    </dd>
+    <dt>Sage Abra HRMS Recorded Demos</dt>
+  </dl>
 </body>
 </html>

@@ -4,50 +4,83 @@
  */
 var HoverAccordion = Class.create({
   initialize: function(elem) {
-    elem                 = $(elem);
-    this.active_section  = $$('.active').first();
-    this.is_sliding      = false;
-    this.over_elem       = null;
-    
-    elem.select('.section').each(function(section) {
-      var header = section.down("h5");
-      header.observe('mousemove', function(event) {
-        if (this.is_sliding)
-          return;
-        
-        // wait 2 seconds, if still over elem, start slide
-        this.over_elem = event.element();
-        
-        setTimeout(function(old_elem) {
-          if (this.over_elem == old_elem)
-            this.slide_section(this.over_elem);
-        }.curry(this.over_elem), 350);
-      });
-    });
+    this.elem    = elem;
+  	this.options = Object.extend({
+  	  activeClass: 'active', // Class assigned to active dt/dd
+  		wait:        350,      // Wait time in milliseconds
+  		duration:    350       // Sliding time in milliseconds
+  	}, arguments[1] || {});
+  	
+  	// Reference action method when given an alias
+  	if (!this.options.effect)
+      this.options.effect = (this.options.duration <= 0) ? this.effect.toggle : this.effect.slide;
+	
+	  // Wait until the DOM is loaded
+    if (document.loaded)
+      this.setup(elem);
+    else
+      document.observe('dom:loaded', this.setup.bind(this));
   },
   
-  slide_section: function(clicked_elem) {
-    var clicked_section = clicked_elem.up('.section');
-    var clicked_content = clicked_section.down(".content");
+  setup: function(elem) {
+    this.elem       = $(this.elem);
+    this.isSliding = false;
 
-    if (clicked_section.hasClassName('active') || !clicked_content) 
-      return;
+    this.elem.select('dt + dd').each(function(e) {
+      var header = e.previous('dt');
+      header.setAttribute('hascontent', 'true');
+      if (header.hasClassName(this.options.activeClass))
+        this.currentElement = header;
+      else
+        e.hide();
+    }, this);
+    
+    document.observe('mousemove', function(event) {
+      if (this.isSliding)
+        return;
+
+      this.overElement = event.findElement('dt');
+      
+      if (!this.overElement || (this.overElement.getAttribute('hascontent') != 'true') || (this.overElement.up('dl') != this.elem))
+        return;
+        
+      // wait a few seconds, if still over elem, start slide
+      setTimeout(this.beginSlide.curry(this.overElement).bind(this), this.options.wait);
+    }.bindAsEventListener(this));
+  },
   
-    var active_content = this.active_section.down(".content");
-    this.is_sliding = true;
+  beginSlide: function(clickedElement) {
+    if (this.isSliding || (this.overElement == this.currentElement) || (this.overElement != clickedElement))
+      return;
 
-    new Effect.Parallel([
-      Effect.BlindDown(clicked_content),
-      Effect.SlideUp(active_content)
-    ], { 
-      duration: 0.35,
-      afterFinish: function() { 
-        this.is_sliding = false;
-      }.bind(this)
-    });
-
-    this.active_section.removeClassName('active');
-    clicked_section.addClassName('active');
-    this.active_section = clicked_section;
+    this.isSliding = true;
+    this.options.effect.bind(this)(clickedElement.next('dd'), 
+                        this.currentElement.next('dd'),
+                        this.afterSlide.curry(clickedElement).bind(this));
+  },
+  
+  afterSlide: function(clickedElement) {
+    this.isSliding = false;
+    this.currentElement.removeClassName(this.options.activeClass);
+    this.currentElement = clickedElement;
+    this.currentElement.addClassName(this.options.activeClass);
+  },
+  
+  effect: {
+    toggle: function(showElem, hideElem, afterCallback) {
+      hideElem.hide();
+      showElem.show();
+      afterCallback();
+    },
+    
+    slide: function(showElem, hideElem, afterCallback) {
+      new Effect.Parallel([
+        Effect.SlideDown(showElem),
+        Effect.BlindUp(hideElem)
+      ], { 
+        duration: this.options.duration / 1000,
+        afterFinish: afterCallback
+      });
+    }
   }
-}); 
+});
